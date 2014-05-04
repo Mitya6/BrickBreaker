@@ -24,6 +24,7 @@ public class BrickBreaker {
 	private ArrayList<GameObject> gameObjects;
 	private static final int TIMER_INTERVAL = 10;
 	private Display display;
+	private ArrayList<Brick> bricksToRemove;
 
 	public static void main(String[] args) {
 		final BrickBreaker bb = new BrickBreaker();
@@ -57,6 +58,7 @@ public class BrickBreaker {
 		display = new Display();
 
 		gameObjects = new ArrayList<GameObject>();
+		bricksToRemove = new ArrayList<Brick>();
 
 		time = System.nanoTime();
 
@@ -72,17 +74,28 @@ public class BrickBreaker {
 			public void keyReleased(KeyEvent arg0) {
 				
 				if (arg0.keyCode == SWT.ARROW_RIGHT || arg0.keyCode == SWT.ARROW_LEFT) {
-					((Pad)gameObjects.get(2)).setPadDir(0);
-				}				
+					((Pad)gameObjects.get(2)).setHorDir(0);
+				}
+				
+				if (arg0.keyCode == SWT.ARROW_UP || arg0.keyCode == SWT.ARROW_DOWN) {
+					((Pad)gameObjects.get(2)).setVertDir(0);
+				}
 			}
 			
 			@Override
 			public void keyPressed(KeyEvent arg0) {
 				if (arg0.keyCode == SWT.ARROW_RIGHT) {
-					((Pad)gameObjects.get(2)).setPadDir(1);
+					((Pad)gameObjects.get(2)).setHorDir(1);
 				}
 				if (arg0.keyCode == SWT.ARROW_LEFT) {
-					((Pad)gameObjects.get(2)).setPadDir(-1);
+					((Pad)gameObjects.get(2)).setHorDir(-1);
+				}
+				
+				if (arg0.keyCode == SWT.ARROW_UP) {
+					((Pad)gameObjects.get(2)).setVertDir(-1);
+				}
+				if (arg0.keyCode == SWT.ARROW_DOWN) {
+					((Pad)gameObjects.get(2)).setVertDir(1);
 				}
 			}
 		});
@@ -121,11 +134,21 @@ public class BrickBreaker {
 		
 		// Add game objects here
 		gameObjects.add(new Ball(this, new Position(200, 350), 25, 25, new Speed(
-				-1.5, -1.5)));
+				3.5)));
 		
-		Rectangle rect = shell.getClientArea();
-		gameObjects.add(new Board(this, new Position(0, 0), rect.width, rect.height));
-		gameObjects.add(new Pad(this, new Position(250, 500), 100, 10, new Speed(5, 0)));
+		Rectangle clientArea = shell.getClientArea();
+		gameObjects.add(new Board(this, new Position(0, 0), clientArea.width, clientArea.height));
+		gameObjects.add(new Pad(this, new Position(250, 500), 100, 10, new Speed(7)));
+		
+		//gameObjects.add(new Brick(this, new Position(100, 100)));
+		//gameObjects.add(new Brick(this, new Position(180, 130)));
+		//gameObjects.add(new Brick(this, new Position(300, 200)));
+		
+		for (int i = 0; i < clientArea.width / Brick.defWidth; i++) {
+			for (int j = 0; j < 8; j++) {
+				gameObjects.add(new Brick(this, new Position(20 + i*Brick.defWidth, 20 + j*Brick.defHeight)));
+			}
+		}
 
 		shell.open();
 	}
@@ -134,6 +157,10 @@ public class BrickBreaker {
 
 		for (GameObject obj : gameObjects) {
 			obj.control();
+		}
+		
+		for (Brick b : bricksToRemove) {
+			gameObjects.remove(b);
 		}
 		
 		canvas.redraw();
@@ -145,5 +172,9 @@ public class BrickBreaker {
 	
 	public ArrayList<GameObject> getGameObjects() {
 		return gameObjects;
+	}
+	
+	public ArrayList<Brick> getBricksToRemove() {
+		return bricksToRemove;
 	}
 }

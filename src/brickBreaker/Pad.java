@@ -6,13 +6,15 @@ import org.eclipse.swt.graphics.GC;
 public class Pad extends GameObject {
 
 	private Speed speed;
-	private int padDir;
+	private int vertDir;
+	private int horDir;
 
 	public Pad(BrickBreaker bb, Position pos, double width, double height,
 			Speed speed) {
 		super(bb, pos, width, height);
 		this.speed = speed;
-		this.padDir = 0;
+		this.vertDir = 0;
+		this.horDir = 0;
 	}
 
 	@Override
@@ -28,23 +30,37 @@ public class Pad extends GameObject {
 
 	@Override
 	public void control() {
-		if ((padDir > 0 && this.right() < bb.getGameObjects().get(1).right()) || 
-				(padDir < 0 && this.left() > bb.getGameObjects().get(1).left())) {
-		this.position.x += padDir * this.speed.vx;
+		if ((horDir > 0 && this.right() < bb.getGameObjects().get(1).right()) || 
+				(horDir < 0 && this.left() > bb.getGameObjects().get(1).left())) {
+		this.position.x += horDir * this.speed.vX();
+		}
+		
+		if ((vertDir > 0 && this.bottom() < 550) || 
+				(vertDir < 0 && this.top() > 300)) {
+		this.position.y += vertDir * this.speed.vY();
 		}
 	}
 
-	public void setPadDir(int dir) {
+	public void setVertDir(int dir) {
 		if (dir == 1)
-			padDir = 1;
+			vertDir = 1;
 		if (dir == -1)
-			padDir = -1;
+			vertDir = -1;
 		if (dir == 0)
-			padDir = 0;
+			vertDir = 0;
 	}
 	
-	public int getPadDir() {
-		return this.padDir;
+	public void setHorDir(int dir) {
+		if (dir == 1)
+			horDir = 1;
+		if (dir == -1)
+			horDir = -1;
+		if (dir == 0)
+			horDir = 0;
 	}
+	
+//	public int getPadDir() {
+//		return this.vertDir;
+//	}
 
 }
