@@ -11,10 +11,10 @@ public class Brick extends GameObject {
 	private int green;
 	private int blue;
 	
-	public static final int defWidth = 60;
-	public static final int defHeight = 25;
+	public static final int defWidth = 80;
+	public static final int defHeight = 30;
 
-	public Brick(BrickBreaker bb, Position pos, double width, double height) {
+	public Brick(BrickBreaker bb, Point pos, double width, double height) {
 		super(bb, pos, width, height);
 
 		this.red = getRandomInt();
@@ -22,7 +22,7 @@ public class Brick extends GameObject {
 		this.blue = getRandomInt();
 	}
 	
-	public Brick(BrickBreaker bb, Position pos) {
+	public Brick(BrickBreaker bb, Point pos) {
 		super(bb, pos, defWidth, defHeight);
 
 		this.red = getRandomInt();
@@ -53,4 +53,6 @@ public class Brick extends GameObject {
 		// TODO Auto-generated method stub
 
 	}
+	
+	
 }

@@ -19,32 +19,23 @@ import org.eclipse.swt.widgets.Shell;
 public class BrickBreaker {
 
 	private static Shell shell;
-	private long time;
 	private Canvas canvas;
 	private ArrayList<GameObject> gameObjects;
 	private static final int TIMER_INTERVAL = 10;
 	private Display display;
 	private ArrayList<Brick> bricksToRemove;
+	private GameState state;
+	private Runnable runnable;
 
 	public static void main(String[] args) {
 		final BrickBreaker bb = new BrickBreaker();
-
-		Runnable runnable = new Runnable() {
-			public void run() {
-				if (!shell.isDisposed()) {
-					bb.SimulateWorld(0, 0);
-					bb.display.timerExec(TIMER_INTERVAL, this);
-				}
-			}
-		};
-		bb.display.timerExec(TIMER_INTERVAL, runnable);
 
 		while (!shell.isDisposed()) {
 			if (!bb.display.readAndDispatch()) {
 				bb.display.sleep();
 			}
 		}
-		
+
 		bb.release();
 	}
 
@@ -53,55 +44,91 @@ public class BrickBreaker {
 		display.dispose();
 	}
 
-	public BrickBreaker() {		
+	private void runGame() {
+		state = GameState.RUNNING;
+
+		runnable = new Runnable() {
+			public void run() {
+				if (!shell.isDisposed()) {
+					SimulateWorld();
+					display.timerExec(TIMER_INTERVAL, this);
+				}
+			}
+		};
+		display.timerExec(TIMER_INTERVAL, runnable);
+	}
+
+	private void pauseGame() {
+		state = GameState.PAUSED;
+
+		display.timerExec(-1, runnable);
+	}
+
+	public BrickBreaker() {
+
+		state = GameState.MAINMENU;
 
 		display = new Display();
 
 		gameObjects = new ArrayList<GameObject>();
 		bricksToRemove = new ArrayList<Brick>();
 
-		time = System.nanoTime();
-
 		shell = new Shell(display, SWT.CLOSE | SWT.TITLE | SWT.MIN);
 		shell.setText("BrickBreaker");
 		shell.setSize(600, 600);
 		shell.setLocation(600, 200);
-		shell.setLayout(new FillLayout());	
-		
+		shell.setLayout(new FillLayout());
+
 		shell.addKeyListener(new KeyListener() {
-			
+
 			@Override
 			public void keyReleased(KeyEvent arg0) {
-				
-				if (arg0.keyCode == SWT.ARROW_RIGHT || arg0.keyCode == SWT.ARROW_LEFT) {
-					((Pad)gameObjects.get(2)).setHorDir(0);
-				}
-				
-				if (arg0.keyCode == SWT.ARROW_UP || arg0.keyCode == SWT.ARROW_DOWN) {
-					((Pad)gameObjects.get(2)).setVertDir(0);
-				}
+
+				if (state == GameState.RUNNING) {
+					if (arg0.keyCode == SWT.ARROW_RIGHT
+							|| arg0.keyCode == SWT.ARROW_LEFT) {
+						((Pad) gameObjects.get(2)).setHorDir(0);
+					}
+
+					if (arg0.keyCode == SWT.ARROW_UP
+							|| arg0.keyCode == SWT.ARROW_DOWN) {
+						((Pad) gameObjects.get(2)).setVertDir(0);
+					}
+				}				
 			}
-			
+
 			@Override
 			public void keyPressed(KeyEvent arg0) {
-				if (arg0.keyCode == SWT.ARROW_RIGHT) {
-					((Pad)gameObjects.get(2)).setHorDir(1);
-				}
-				if (arg0.keyCode == SWT.ARROW_LEFT) {
-					((Pad)gameObjects.get(2)).setHorDir(-1);
-				}
 				
-				if (arg0.keyCode == SWT.ARROW_UP) {
-					((Pad)gameObjects.get(2)).setVertDir(-1);
+				// Control the pad
+				if (state == GameState.RUNNING) {
+					if (arg0.keyCode == SWT.ARROW_RIGHT) {
+						((Pad) gameObjects.get(2)).setHorDir(1);
+					}
+					if (arg0.keyCode == SWT.ARROW_LEFT) {
+						((Pad) gameObjects.get(2)).setHorDir(-1);
+					}
+
+					if (arg0.keyCode == SWT.ARROW_UP) {
+						((Pad) gameObjects.get(2)).setVertDir(-1);
+					}
+					if (arg0.keyCode == SWT.ARROW_DOWN) {
+						((Pad) gameObjects.get(2)).setVertDir(1);
+					}
 				}
-				if (arg0.keyCode == SWT.ARROW_DOWN) {
-					((Pad)gameObjects.get(2)).setVertDir(1);
+
+				// Pause and Resume game with space
+				if (arg0.keyCode == SWT.SPACE) {
+					if (state == GameState.RUNNING) {
+						pauseGame();
+					} else if (state == GameState.PAUSED) {
+						runGame();
+					}
 				}
 			}
 		});
-		
 
-		Color c1 = new Color(shell.getDisplay(), 0, 0, 0); 
+		Color c1 = new Color(shell.getDisplay(), 0, 0, 0);
 		canvas = new Canvas(shell, SWT.NO_BACKGROUND);
 		canvas.setBackground(c1);
 		c1.dispose();
@@ -113,13 +140,13 @@ public class BrickBreaker {
 
 				// Create the image to fill the canvas
 				Image image = new Image(shell.getDisplay(), canvas.getBounds());
-				
+
 				// Set up the offscreen gc
 				GC gcImage = new GC(image);
 
 				gcImage.setBackground(event.gc.getBackground());
 				gcImage.fillRectangle(image.getBounds());
-				
+
 				for (GameObject obj : gameObjects) {
 					obj.draw(gcImage);
 				}
@@ -131,49 +158,54 @@ public class BrickBreaker {
 				gcImage.dispose();
 			}
 		});
-		
+
 		// Add game objects here
-		gameObjects.add(new Ball(this, new Position(200, 350), 25, 25, new Speed(
+		gameObjects.add(new Ball(this, new Point(200, 350), 25, 25, new Speed(
 				3.5)));
-		
+
 		Rectangle clientArea = shell.getClientArea();
-		gameObjects.add(new Board(this, new Position(0, 0), clientArea.width, clientArea.height));
-		gameObjects.add(new Pad(this, new Position(250, 500), 100, 10, new Speed(7)));
-		
-		//gameObjects.add(new Brick(this, new Position(100, 100)));
-		//gameObjects.add(new Brick(this, new Position(180, 130)));
-		//gameObjects.add(new Brick(this, new Position(300, 200)));
-		
-		for (int i = 0; i < clientArea.width / Brick.defWidth; i++) {
-			for (int j = 0; j < 8; j++) {
-				gameObjects.add(new Brick(this, new Position(20 + i*Brick.defWidth, 20 + j*Brick.defHeight)));
+		gameObjects.add(new Board(this, new Point(0, 0), clientArea.width,
+				clientArea.height));
+		gameObjects.add(new Pad(this, new Point(250, 500), 100, 10,
+				new Speed(7)));
+
+		//		gameObjects.add(new Brick(this, new Point(100, 100)));
+		//		gameObjects.add(new Brick(this, new Point(180, 130)));
+		//		gameObjects.add(new Brick(this, new Point(300, 200)));
+
+		for (int i = 0; i < (clientArea.width - 50) / Brick.defWidth; i++) {
+			for (int j = 0; j < 6; j++) {
+				gameObjects.add(new Brick(this, new Point(50 + i
+						* Brick.defWidth, 50 + j * Brick.defHeight)));
 			}
 		}
 
 		shell.open();
+		runGame();
 	}
 
-	private void SimulateWorld(long startTime, long endTime) {
+	private void SimulateWorld() {
 
 		for (GameObject obj : gameObjects) {
 			obj.control();
 		}
-		
+
 		for (Brick b : bricksToRemove) {
 			gameObjects.remove(b);
 		}
-		
+		bricksToRemove.clear();
+
 		canvas.redraw();
 	}
 
 	public Shell getShell() {
 		return shell;
 	}
-	
+
 	public ArrayList<GameObject> getGameObjects() {
 		return gameObjects;
 	}
-	
+
 	public ArrayList<Brick> getBricksToRemove() {
 		return bricksToRemove;
 	}

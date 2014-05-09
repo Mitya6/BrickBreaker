@@ -9,7 +9,7 @@ public class Pad extends GameObject {
 	private int vertDir;
 	private int horDir;
 
-	public Pad(BrickBreaker bb, Position pos, double width, double height,
+	public Pad(BrickBreaker bb, Point pos, double width, double height,
 			Speed speed) {
 		super(bb, pos, width, height);
 		this.speed = speed;
@@ -35,8 +35,8 @@ public class Pad extends GameObject {
 		this.position.x += horDir * this.speed.vX();
 		}
 		
-		if ((vertDir > 0 && this.bottom() < 550) || 
-				(vertDir < 0 && this.top() > 300)) {
+		if ((vertDir > 0 && this.bottom() < 500) || 
+				(vertDir < 0 && this.top() > 350)) {
 		this.position.y += vertDir * this.speed.vY();
 		}
 	}
@@ -58,9 +58,5 @@ public class Pad extends GameObject {
 		if (dir == 0)
 			horDir = 0;
 	}
-	
-//	public int getPadDir() {
-//		return this.vertDir;
-//	}
 
 }

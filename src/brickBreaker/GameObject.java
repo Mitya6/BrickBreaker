@@ -5,13 +5,13 @@ import org.eclipse.swt.graphics.GC;
 public abstract class GameObject {
 
 	protected BrickBreaker bb;
-	protected Position position;
+	protected Point position;
 	protected double width;
 	protected double height;
 	
 	public GameObject() {}
 	
-	public GameObject(BrickBreaker bb, Position pos, double width, double height) {
+	public GameObject(BrickBreaker bb, Point pos, double width, double height) {
 		this.bb = bb;
 		this.position = pos;
 		this.width = width;
@@ -36,5 +36,10 @@ public abstract class GameObject {
 	
 	public double right() {
 		return position.x + width;
+	}
+	
+	public Point getCenter() {
+		return new Point(this.position.x + this.width / 2, this.position.y
+				+ this.height / 2);
 	}
 }

@@ -6,14 +6,12 @@ import org.eclipse.swt.graphics.GC;
 public class Ball extends GameObject {
 
 	private Speed speed;
-	private boolean ballDead;
 	private boolean lastCollisionWithPad = false;
 
-	public Ball(BrickBreaker bb, Position pos, double width, double height,
+	public Ball(BrickBreaker bb, Point pos, double width, double height,
 			Speed speed) {
 		super(bb, pos, width, height);
 		this.speed = speed;
-		this.ballDead = false;
 	}
 
 	public void draw(GC gc) {
@@ -72,14 +70,24 @@ public class Ball extends GameObject {
 		}
 
 		// Check bricks
+		Brick brick = null;
+		double minDist = Double.MAX_VALUE;
+		
+		// Find closest brick
 		for (int i = 3; i < this.bb.getGameObjects().size(); i++) {
-			Brick brick = (Brick) (bb.getGameObjects().get(i));
-
-			if (rectCollide(brick)) {
-				resetPosition = true;
-				bb.getBricksToRemove().add(brick);
-				lastCollisionWithPad = false;
+			Brick b = (Brick) (bb.getGameObjects().get(i));
+			if (this.getCenter().distance(b.getCenter()) < minDist) {
+				
+				minDist = this.getCenter().distance(b.getCenter());
+				brick = b;
 			}
+			
+		}
+		
+		if (brick != null && rectCollide(brick)) {
+			resetPosition = true;
+			bb.getBricksToRemove().add(brick);
+			lastCollisionWithPad = false;
 		}
 
 		if (resetPosition) {
@@ -104,7 +112,7 @@ public class Ball extends GameObject {
 					|| (this.bottom() > go.bottom() && this.top() < go.top())) {
 
 				resetPosition = true;
-				Position center = this.getCenter();
+				Point center = this.getCenter();
 
 				boolean topleftAbove = false;
 				boolean bottomleftAbove = false;
@@ -142,10 +150,5 @@ public class Ball extends GameObject {
 		}
 
 		return resetPosition;
-	}
-
-	private Position getCenter() {
-		return new Position(this.position.x + this.width / 2, this.position.y
-				+ this.height / 2);
 	}
 }
