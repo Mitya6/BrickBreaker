@@ -1,10 +1,13 @@
 package brickBreaker;
 
+import java.io.Serializable;
+
 import org.eclipse.swt.graphics.GC;
 
-public abstract class GameObject {
+public abstract class GameObject implements Serializable {
 
-	protected BrickBreaker bb;
+	protected static final long serialVersionUID = 1L;
+	protected transient BrickBreaker bb;
 	protected Point position;
 	protected double width;
 	protected double height;
@@ -43,5 +46,9 @@ public abstract class GameObject {
 	public Point getCenter() {
 		return new Point(this.position.x + this.width / 2, this.position.y
 				+ this.height / 2);
+	}
+	
+	public void setBrickBreaker(BrickBreaker bb) {
+		this.bb = bb;
 	}
 }

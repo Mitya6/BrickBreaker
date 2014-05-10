@@ -25,6 +25,10 @@ public class Ball extends GameObject {
 	}
 
 	public void control() {
+		
+		if (this.top() > bb.getShell().getClientArea().height) {
+			bb.endGame();
+		}
 
 		double vx = this.speed.vX();
 		double vy = this.speed.vY();

@@ -8,8 +8,8 @@ import org.eclipse.swt.graphics.Image;
 
 public class EndView extends View {
 
-	public EndView(BrickBreaker bb, boolean win) {
-		super(bb);
+	public EndView(BrickBreaker bb, boolean deserialized, boolean win) {
+		super(bb, deserialized);
 
 		paintListener = new EndViewPaintListener();
 

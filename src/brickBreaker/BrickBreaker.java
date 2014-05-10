@@ -32,11 +32,19 @@ public class BrickBreaker {
 		bb.release();
 	}
 
-	public void runGame() {
+	public void runGame(boolean loaded) {
 
 		if (state == GameState.MAINMENU) {
 			screen.release();
-			screen = new PlayView(this);
+			if (!loaded) {
+				screen = new PlayView(this, false);
+			}
+			else {
+				PlayView temp = new PlayView(this, false);
+				screen = temp.load(this);
+				temp.release();
+				((PlayView)screen).addPaintListener();
+			}
 		}
 
 		state = GameState.RUNNING;
@@ -44,11 +52,14 @@ public class BrickBreaker {
 		runnable = new Runnable() {
 			public void run() {
 				if (!shell.isDisposed()) {
-					((PlayView) screen).SimulateWorld();
 					display.timerExec(TIMER_INTERVAL, this);
-					
-					if (((PlayView)screen).getRemainingBricks() == 0) {
-						endGame();
+
+					((PlayView) screen).SimulateWorld();
+
+					if (state == GameState.RUNNING) {
+						if (((PlayView) screen).getRemainingBricks() == 0) {
+							endGame();
+						}
 					}
 				}
 			}
@@ -60,40 +71,40 @@ public class BrickBreaker {
 		state = GameState.PAUSED;
 
 		display.timerExec(-1, runnable);
-		
+
 		canvas.redraw();
 	}
-	
+
 	public void endGame() {
 		state = GameState.ENDED;
-		
+
 		display.timerExec(-1, runnable);
-		
-		int remainingBricks = ((PlayView)screen).getRemainingBricks();
-		
+
+		int remainingBricks = ((PlayView) screen).getRemainingBricks();
+
 		screen.release();
-		screen = new EndView(this, remainingBricks == 0);
-		
+		screen = new EndView(this, false, remainingBricks == 0);
+
 		canvas.redraw();
 	}
-	
+
 	public void goMainMenu() {
 		state = GameState.MAINMENU;
-		
+
 		if (screen != null) {
 			screen.release();
 		}
-		screen = new MainMenuView(this);
-		
+		screen = new MainMenuView(this, false);
+
 		canvas.redraw();
 	}
-	
+
 	public void goHighscore() {
 		state = GameState.HIGHSCORE;
-		
+
 		screen.release();
-		screen = new HighscoreView(this);
-		
+		screen = new HighscoreView(this, false);
+
 		canvas.redraw();
 	}
 
@@ -129,7 +140,7 @@ public class BrickBreaker {
 		c1.dispose();
 
 		shell.open();
-		
+
 		goMainMenu();
 	}
 

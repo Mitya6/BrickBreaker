@@ -6,7 +6,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 
 public class Brick extends GameObject {
-	
+
 	private int red;
 	private int green;
 	private int blue;

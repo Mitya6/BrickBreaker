@@ -1,8 +1,11 @@
 package brickBreaker;
 
+import java.io.Serializable;
 
-public class Speed {
 
+public class Speed implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private double vx;
 	private double vy;
 	private double magnitude;

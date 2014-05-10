@@ -1,5 +1,10 @@
 package brickBreaker;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import org.eclipse.swt.SWT;
@@ -12,10 +17,14 @@ import org.eclipse.swt.graphics.Rectangle;
 public class PlayView extends View {
 
 	private ArrayList<Brick> bricksToRemove;
+	private static final String filename = "savegame.dat";
 
-	public PlayView(final BrickBreaker bb) {
-		super(bb);
-		bricksToRemove = new ArrayList<Brick>();
+	public PlayView(final BrickBreaker bb, boolean deserialized) {
+		super(bb, deserialized);
+
+		if (!deserialized) {
+			bricksToRemove = new ArrayList<Brick>();
+		}
 
 		paintListener = new PlayViewPaintListener();
 
@@ -31,7 +40,7 @@ public class PlayView extends View {
 		// Board [1]
 		Rectangle clientArea = bb.getShell().getClientArea();
 		gameObjects.add(new Board(bb, this, new Point(0, 0), clientArea.width, clientArea.height));
-		
+
 		// Pad [2]
 		gameObjects.add(new Pad(bb, this, new Point(250, 500), 100, 10, new Speed(7)));
 
@@ -63,14 +72,14 @@ public class PlayView extends View {
 	public void render(GC gcImage) {
 
 		for (int i = 0; i < gameObjects.size(); i++) {
-			
+
 			if (i == 3 && bb.getState() == GameState.PAUSED) {
 				continue;
 			}
 			if (i >= 4 && i <= 6 && bb.getState() == GameState.RUNNING) {
 				continue;
 			}
-			
+
 			gameObjects.get(i).draw(gcImage);
 		}
 	}
@@ -114,14 +123,21 @@ public class PlayView extends View {
 			if (bb.getState() == GameState.RUNNING) {
 				bb.pauseGame();
 			} else if (bb.getState() == GameState.PAUSED) {
-				bb.runGame();
+				bb.runGame(false);
 			}
 		}
-		
+
 		// Finish if paused
 		if (bb.getState() == GameState.PAUSED) {
 			if (keyCode == 'F' || keyCode == 'f') {
 				bb.endGame();
+			}
+		}
+
+		// Save if paused
+		if (bb.getState() == GameState.PAUSED) {
+			if (keyCode == 'S' || keyCode == 's') {
+				save();
 			}
 		}
 	}
@@ -140,12 +156,67 @@ public class PlayView extends View {
 		}
 	}
 
+	private void save() {
+		ObjectOutputStream out = null;
+		try {
+			FileOutputStream f = new FileOutputStream(filename);
+			out = new ObjectOutputStream(f);
+			out.writeObject(this);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	public PlayView load(BrickBreaker bb) {
+		PlayView playView = null;
+		ObjectInputStream in = null;
+		try {
+			FileInputStream f = new FileInputStream(filename);
+			in = new ObjectInputStream(f);
+			playView = (PlayView)in.readObject();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		// Additional initialization
+		playView.bb = bb;		
+		
+		for	(GameObject go : playView.gameObjects) {
+			go.setBrickBreaker(bb);
+		}
+		
+		return playView;
+	}
+
 	public ArrayList<Brick> getBricksToRemove() {
 		return bricksToRemove;
 	}
-	
+
 	public int getRemainingBricks() {
 		return gameObjects.size() - 7;
+	}
+	
+	public void addPaintListener() {
+		this.paintListener = new PlayViewPaintListener();
+		this.bb.canvas.addPaintListener(this.paintListener);
 	}
 
 	private class PlayViewPaintListener implements PaintListener {

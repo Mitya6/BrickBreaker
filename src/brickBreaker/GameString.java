@@ -8,15 +8,14 @@ import org.eclipse.swt.graphics.GC;
 public class GameString extends GameObject {
 	
 	private String text;
-	private FontData fontData;
+	private int fontSize;
 	
 	public GameString(BrickBreaker bb, View screen, Point pos, String s, int fontSize) {
 		super(bb, screen, pos, 0, 0);
 		
 		this.text = s;
 		
-		fontData = new FontData();
-		fontData.setHeight(fontSize);
+		this.fontSize = fontSize;		
 	}
 
 	@Override
@@ -30,6 +29,8 @@ public class GameString extends GameObject {
 		gc.setBackground(c2);
 		c1.dispose();
 		
+		FontData fontData = new FontData();
+		fontData.setHeight(fontSize);
 		Font font = new Font(bb.getShell().getDisplay(), fontData);
 		gc.setFont(font);	
 		

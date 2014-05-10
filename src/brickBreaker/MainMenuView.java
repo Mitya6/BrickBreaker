@@ -8,8 +8,8 @@ import org.eclipse.swt.graphics.Image;
 
 public class MainMenuView extends View {
 
-	public MainMenuView(final BrickBreaker bb) {
-		super(bb);
+	public MainMenuView(final BrickBreaker bb, boolean deserialized) {
+		super(bb, deserialized);
 		
 		paintListener = new MainMenuViewPaintListener();
 		
@@ -50,9 +50,9 @@ public class MainMenuView extends View {
 	public void keyPressed(int keyCode) {
 
 		if (keyCode == SWT.SPACE) {
-			bb.runGame();
+			bb.runGame(false);
 		} else if (keyCode == 'L' || keyCode == 'l') {
-			
+			bb.runGame(true);
 		} else if (keyCode == 'H' || keyCode == 'h') {
 			bb.goHighscore();
 		} else if (keyCode == 'X' || keyCode == 'x') {

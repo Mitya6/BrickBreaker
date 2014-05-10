@@ -8,8 +8,8 @@ import org.eclipse.swt.graphics.Image;
 
 public class HighscoreView extends View {
 
-	public HighscoreView(BrickBreaker bb) {
-		super(bb);
+	public HighscoreView(BrickBreaker bb, boolean deserialized) {
+		super(bb, deserialized);
 
 		paintListener = new HighscoreViewPaintListener();
 
