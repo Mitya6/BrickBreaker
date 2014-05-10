@@ -8,9 +8,9 @@ public class Ball extends GameObject {
 	private Speed speed;
 	private boolean lastCollisionWithPad = false;
 
-	public Ball(BrickBreaker bb, Point pos, double width, double height,
+	public Ball(BrickBreaker bb, View screen, Point pos, double width, double height,
 			Speed speed) {
-		super(bb, pos, width, height);
+		super(bb, screen, pos, width, height);
 		this.speed = speed;
 	}
 
@@ -43,7 +43,7 @@ public class Ball extends GameObject {
 		boolean resetPosition = false;
 
 		// Check board
-		Board board = (Board) (bb.getGameObjects().get(1));
+		Board board = (Board) (screen.getGameObjects().get(1));
 		if (this.top() < board.top()) {
 			resetPosition = true;
 			this.speed.negateY();
@@ -62,7 +62,7 @@ public class Ball extends GameObject {
 
 		// Check pad
 		if (!lastCollisionWithPad) {
-			Pad pad = (Pad) (bb.getGameObjects().get(2));
+			Pad pad = (Pad) (screen.getGameObjects().get(2));
 			if (rectCollide(pad)) {
 				resetPosition = true;
 				lastCollisionWithPad = true;
@@ -74,8 +74,8 @@ public class Ball extends GameObject {
 		double minDist = Double.MAX_VALUE;
 		
 		// Find closest brick
-		for (int i = 3; i < this.bb.getGameObjects().size(); i++) {
-			Brick b = (Brick) (bb.getGameObjects().get(i));
+		for (int i = 7; i < screen.getGameObjects().size(); i++) {
+			Brick b = (Brick) (screen.getGameObjects().get(i));
 			if (this.getCenter().distance(b.getCenter()) < minDist) {
 				
 				minDist = this.getCenter().distance(b.getCenter());
@@ -86,7 +86,7 @@ public class Ball extends GameObject {
 		
 		if (brick != null && rectCollide(brick)) {
 			resetPosition = true;
-			bb.getBricksToRemove().add(brick);
+			((PlayView)screen).getBricksToRemove().add(brick);
 			lastCollisionWithPad = false;
 		}
 

@@ -14,16 +14,16 @@ public class Brick extends GameObject {
 	public static final int defWidth = 80;
 	public static final int defHeight = 30;
 
-	public Brick(BrickBreaker bb, Point pos, double width, double height) {
-		super(bb, pos, width, height);
+	public Brick(BrickBreaker bb, View screen, Point pos, double width, double height) {
+		super(bb, screen, pos, width, height);
 
 		this.red = getRandomInt();
 		this.green = getRandomInt();
 		this.blue = getRandomInt();
 	}
 	
-	public Brick(BrickBreaker bb, Point pos) {
-		super(bb, pos, defWidth, defHeight);
+	public Brick(BrickBreaker bb, View screen, Point pos) {
+		super(bb, screen, pos, defWidth, defHeight);
 
 		this.red = getRandomInt();
 		this.green = getRandomInt();

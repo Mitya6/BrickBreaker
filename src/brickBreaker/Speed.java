@@ -1,6 +1,5 @@
 package brickBreaker;
 
-import java.util.Random;
 
 public class Speed {
 

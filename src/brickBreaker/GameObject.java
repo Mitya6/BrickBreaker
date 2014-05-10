@@ -8,14 +8,16 @@ public abstract class GameObject {
 	protected Point position;
 	protected double width;
 	protected double height;
+	protected View screen;
 	
 	public GameObject() {}
 	
-	public GameObject(BrickBreaker bb, Point pos, double width, double height) {
+	public GameObject(BrickBreaker bb, View screen, Point pos, double width, double height) {
 		this.bb = bb;
 		this.position = pos;
 		this.width = width;
 		this.height = height;
+		this.screen = screen;
 	}
 	
 	public abstract void draw(GC gc);

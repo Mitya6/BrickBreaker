@@ -9,9 +9,9 @@ public class Pad extends GameObject {
 	private int vertDir;
 	private int horDir;
 
-	public Pad(BrickBreaker bb, Point pos, double width, double height,
+	public Pad(BrickBreaker bb, View screen, Point pos, double width, double height,
 			Speed speed) {
-		super(bb, pos, width, height);
+		super(bb, screen, pos, width, height);
 		this.speed = speed;
 		this.vertDir = 0;
 		this.horDir = 0;
@@ -19,7 +19,7 @@ public class Pad extends GameObject {
 
 	@Override
 	public void draw(GC gc) {
-		Color c1 = new Color(this.bb.getShell().getDisplay(), 100, 255, 255);
+		Color c1 = new Color(this.bb.getShell().getDisplay(), 255, 0, 0);
 
 		gc.setBackground(c1);
 		gc.fillRectangle((int) position.x, (int) position.y, (int) width,
@@ -30,12 +30,12 @@ public class Pad extends GameObject {
 
 	@Override
 	public void control() {
-		if ((horDir > 0 && this.right() < bb.getGameObjects().get(1).right()) || 
-				(horDir < 0 && this.left() > bb.getGameObjects().get(1).left())) {
+		if ((horDir > 0 && this.right() < screen.getGameObjects().get(1).right()) || 
+				(horDir < 0 && this.left() > screen.getGameObjects().get(1).left())) {
 		this.position.x += horDir * this.speed.vX();
 		}
 		
-		if ((vertDir > 0 && this.bottom() < 500) || 
+		if ((vertDir > 0 && this.bottom() < 510) || 
 				(vertDir < 0 && this.top() > 350)) {
 		this.position.y += vertDir * this.speed.vY();
 		}

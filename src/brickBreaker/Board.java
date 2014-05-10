@@ -9,8 +9,8 @@ public class Board extends GameObject {
 	private ArrayList<GameObject> gameObjects;
 	
 
-	public Board(BrickBreaker bb, Point pos, double width, double height) {
-		super(bb, pos, width, height);
+	public Board(BrickBreaker bb, View screen, Point pos, double width, double height) {
+		super(bb, screen, pos, width, height);
 		
 		this.gameObjects = new ArrayList<GameObject>();
 	}
