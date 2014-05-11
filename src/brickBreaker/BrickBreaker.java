@@ -1,5 +1,8 @@
 package brickBreaker;
 
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -21,6 +24,14 @@ public class BrickBreaker {
 	private View screen;
 
 	public static void main(String[] args) {
+		
+		
+		
+		
+		
+		
+		
+		
 		final BrickBreaker bb = new BrickBreaker();
 
 		while (!shell.isDisposed()) {

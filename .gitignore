@@ -162,3 +162,5 @@ report/
 
 classfiles/
 *.dat
+log/
+scoreData/
