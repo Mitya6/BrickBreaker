@@ -1,5 +1,10 @@
 package brickBreaker;
 
+import java.io.IOException;
+
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 
@@ -7,6 +12,7 @@ public class Ball extends GameObject {
 
 	private Speed speed;
 	private boolean lastCollisionWithPad = false;
+	private static Logger collisionLogger = null;
 
 	public Ball(BrickBreaker bb, View screen, Point pos, double width, double height,
 			Speed speed) {
@@ -45,6 +51,23 @@ public class Ball extends GameObject {
 	public boolean checkCollision(double vx, double vy) {
 
 		boolean resetPosition = false;
+		
+		// Set up the collisionLogger
+		if (collisionLogger == null) {
+			collisionLogger = Logger.getRootLogger();
+			
+			FileAppender appender = null;
+			try {
+				appender = new FileAppender(new PatternLayout("%d{HH:mm:ss} - %p - collision: %m%n"), ".\\log\\collisionLog.log", true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if (appender != null) {
+				collisionLogger.addAppender(appender);
+			}
+		}
+		
+		
 
 		// Check board
 		Board board = (Board) (screen.getGameObjects().get(1));
@@ -52,16 +75,22 @@ public class Ball extends GameObject {
 			resetPosition = true;
 			this.speed.negateY();
 			lastCollisionWithPad = false;
+			
+			collisionLogger.info("board top");
 		}
 		if (this.left() < board.left()) {
 			resetPosition = true;
 			this.speed.negateX();
 			lastCollisionWithPad = false;
+			
+			collisionLogger.info("board left");
 		}
 		if (this.right() > board.right()) {
 			resetPosition = true;
 			this.speed.negateX();
 			lastCollisionWithPad = false;
+			
+			collisionLogger.info("board right");
 		}
 
 		// Check pad
@@ -70,6 +99,8 @@ public class Ball extends GameObject {
 			if (rectCollide(pad)) {
 				resetPosition = true;
 				lastCollisionWithPad = true;
+				
+				collisionLogger.info("pad");
 			}
 		}
 
@@ -92,6 +123,8 @@ public class Ball extends GameObject {
 			resetPosition = true;
 			((PlayView)screen).getBricksToRemove().add(brick);
 			lastCollisionWithPad = false;
+			
+			collisionLogger.info(String.format("brick (%.2f ; %.2f)", brick.left(), brick.top()));
 		}
 
 		if (resetPosition) {
