@@ -1,8 +1,5 @@
 package brickBreaker;
 
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -23,14 +20,7 @@ public class BrickBreaker {
 
 	private View screen;
 
-	public static void main(String[] args) {
-		
-		
-		
-		
-		
-		
-		
+	public static void main(String[] args) {		
 		
 		final BrickBreaker bb = new BrickBreaker();
 
@@ -94,7 +84,7 @@ public class BrickBreaker {
 		int remainingBricks = ((PlayView) screen).getRemainingBricks();
 
 		screen.release();
-		screen = new EndView(this, false, remainingBricks == 0);
+		screen = new EndView(this, false, remainingBricks);
 
 		canvas.redraw();
 	}

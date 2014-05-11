@@ -1,5 +1,8 @@
 package brickBreaker;
 
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -8,19 +11,35 @@ import org.eclipse.swt.graphics.Image;
 
 public class EndView extends View {
 
-	public EndView(BrickBreaker bb, boolean deserialized, boolean win) {
+	public EndView(BrickBreaker bb, boolean deserialized, int remainingBricks) {
 		super(bb, deserialized);
+		
+		uploadScore(remainingBricks);
 
 		paintListener = new EndViewPaintListener();
 
 		bb.canvas.addPaintListener(paintListener);
 		
-		if (win) {
+		if (remainingBricks == 0) {
 			gameObjects.add(new GameString(bb, this, new Point(160, 230), "You Won", 50));
 		}
 		else {
 			gameObjects.add(new GameString(bb, this, new Point(120, 230), "Game Over", 50));
 		}
+	}
+
+	private void uploadScore(int remainingBricks) {
+		
+		Score score = new Score("Matyas", remainingBricks, 1234568);
+		
+		String host = "localhost";
+		try {
+		    Registry registry = LocateRegistry.getRegistry(host);
+		    HighscoreManager stub = (HighscoreManager) registry.lookup("regEntry_HighscoreManager");		    
+		    stub.uploadScore(score);
+		} catch (Exception e) {
+		}
+		
 	}
 
 	@Override
